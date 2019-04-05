@@ -81,18 +81,18 @@ void alu(struct cpu *cpu, enum alu_op op, unsigned char regA, unsigned char regB
       break;
 
     case ALU_CMP:
-    //   if (cpu->registers[regA] == cpu->registers[regB])
-    //   {
-    //     cpu->flag = FL_EQUL;
-    //   }
-    //   if (cpu->registers[regA] > cpu->registers[regB])
-    //   {
-    //     cpu->flag = FL_GRTR;
-    //   }
-    //   if (cpu->registers[regA] < cpu->registers[regB])
-    //   {
-    //     cpu->flag = FL_LESS;
-    //   }
+      if (cpu->registers[regA] == cpu->registers[regB])
+      {
+        cpu->flag = FL_EQUL;
+      }
+      if (cpu->registers[regA] > cpu->registers[regB])
+      {
+        cpu->flag = FL_GRTR;
+      }
+      if (cpu->registers[regA] < cpu->registers[regB])
+      {
+        cpu->flag = FL_LESS;
+      }
       break;
 
     // TODO: implement more ALU ops
@@ -191,7 +191,19 @@ void cpu_run(struct cpu *cpu)
         break;
 
       case JEQ:
-        if( cpu->flag == FL_EQUL )
+        if((cpu->flag & FL_EQUL) == FL_EQUL)
+        {
+          cpu->pc = cpu->registers[operand1];
+        }
+        else
+        {
+          cpu->pc ++;
+        }
+        
+        break;
+
+      case JNE:
+        if( (cpu->flag & FL_EQUL) == 0 )
         {
           cpu->pc = cpu->registers[operand1];
         }
@@ -264,5 +276,5 @@ void cpu_init(struct cpu *cpu)
   cpu->registers = calloc(8, sizeof(unsigned char));
   cpu->ram = calloc(256, sizeof(unsigned char));
   cpu->registers[7] = 0xF4;
-  cpu->flag = (char * )FL_INIT;
+  cpu->flag = FL_INIT;
 }

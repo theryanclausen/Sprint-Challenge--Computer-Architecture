@@ -10,7 +10,7 @@ struct cpu {
   unsigned char *registers;
   // ram (array)
   unsigned char *ram;
-  unsigned char *flag;
+  unsigned char flag;
 };
 
 // ALU operations
