@@ -206,7 +206,7 @@ void cpu_run(struct cpu *cpu)
         break;
 
       case JNE:
-        if( cpu->flag == FL_INIT )
+        if( (cpu->flag & FL_EQUL) == FL_INIT )
         {
           cpu->pc = cpu->registers[operand1] - 1;
         }
@@ -219,28 +219,28 @@ void cpu_run(struct cpu *cpu)
       // case JGE:
       //   if( cpu->flag == FL_GRTR || cpu->flag == FL_EQUL)
       //   {
-      //     cpu->pc = cpu->registers[operand1];
+      //     cpu->pc = cpu->registers[operand1] - 1;
       //   }
       //   break;
 
       // case JGT:
       //   if( cpu->flag == FL_GRTR )
       //   {
-      //     cpu->pc = cpu->registers[operand1];
+      //     cpu->pc = cpu->registers[operand1] - 1;
       //   }
       //   break;
 
       // case JLE:
       //   if( cpu->flag == FL_LESS || cpu->flag == FL_EQUL)
       //   {
-      //     cpu->pc = cpu->registers[operand1];
+      //     cpu->pc = cpu->registers[operand1] - 1;
       //   }
       //   break;
 
       // case JLT:
       //   if( cpu->flag == FL_LESS )
       //   {
-      //     cpu->pc = cpu->registers[operand1];
+      //     cpu->pc = cpu->registers[operand1] - 1;
       //   }
       //   break;
 
