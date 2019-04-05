@@ -118,8 +118,11 @@ void cpu_run(struct cpu *cpu)
     // 2. Figure out how many operands this next instruction requires
     unsigned char opCount = command & OPCM;
     // 3. Get the appropriate value(s) of the operands following this instruction
+
     
     
+    //printf(" %d command %d pc\n", command, cpu->pc);
+
     switch(opCount)
     {
       case OPC1:
@@ -187,13 +190,13 @@ void cpu_run(struct cpu *cpu)
         break;
 
       case JMP:
-        cpu->pc = cpu->registers[operand1];
+        cpu->pc = cpu->registers[operand1] - 1;
         break;
 
       case JEQ:
-        if((cpu->flag & FL_EQUL) == FL_EQUL)
+        if(cpu->flag == FL_EQUL)
         {
-          cpu->pc = cpu->registers[operand1];
+          cpu->pc = cpu->registers[operand1] - 1;
         }
         else
         {
@@ -203,9 +206,13 @@ void cpu_run(struct cpu *cpu)
         break;
 
       case JNE:
-        if( (cpu->flag & FL_EQUL) == 0 )
+        if( cpu->flag == FL_INIT )
         {
-          cpu->pc = cpu->registers[operand1];
+          cpu->pc = cpu->registers[operand1] - 1;
+        }
+        else
+        {
+          cpu->pc ++;
         }
         break;
 
@@ -256,6 +263,7 @@ void cpu_run(struct cpu *cpu)
 
       default:
       printf("inst %d \nskip more lines \n", cpu->pc);
+        exit(1);
         break;
         
     }
