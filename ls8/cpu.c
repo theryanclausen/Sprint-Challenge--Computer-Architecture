@@ -13,21 +13,7 @@ void cpu_ram_write(struct cpu *cpu, unsigned char address, unsigned char value)
  */
 void cpu_load(struct cpu *cpu, char *path)
 {
-  // char data[DATA_LEN] = {
-  //   // From print8.ls8
-  //   0b10000010, // LDI R0,8
-  //   0b00000000,
-  //   0b00001000,
-  //   0b01000111, // PRN R0
-  //   0b00000000,
-  //   0b00000001  // HLT
-  // };
-
   int address = 0;
-
-  // for (int i = 0; i < DATA_LEN; i++) {
-  //   cpu->ram[address++] = data[i];
-  // }
 
   // TODO: Replace this with something less hard-code
   FILE *f = fopen(path, "r");
@@ -55,8 +41,6 @@ unsigned char cpu_ram_read(struct cpu *cpu, unsigned char address)
 {
   return cpu-> ram[address];
 }
-
-
 
 /**
  * ALU
@@ -99,6 +83,13 @@ void alu(struct cpu *cpu, enum alu_op op, unsigned char regA, unsigned char regB
   }
 }
 
+void cpu_destroy(struct cpu *cpu)
+{
+  free(cpu->registers);
+  free(cpu->ram);
+  //free(cpu);
+};
+
 /**
  * Run the CPU
  */
@@ -119,10 +110,6 @@ void cpu_run(struct cpu *cpu)
     unsigned char opCount = command & OPCM;
     // 3. Get the appropriate value(s) of the operands following this instruction
 
-    
-    
-    //printf(" %d command %d pc\n", command, cpu->pc);
-
     switch(opCount)
     {
       case OPC1:
@@ -135,7 +122,6 @@ void cpu_run(struct cpu *cpu)
       default:
         break;
     }
-    
     
     // 4. switch() over it to decide on a course of action.
     switch(command)
@@ -155,6 +141,11 @@ void cpu_run(struct cpu *cpu)
         cpu->pc ++;
         break;
 
+      case PRA:
+        printf("%c\n", cpu->registers[operand1]);
+        cpu->pc ++;
+        break;
+
       case LDI:
         cpu->registers[operand1] = operand2;
         cpu->pc += 2;
@@ -162,6 +153,7 @@ void cpu_run(struct cpu *cpu)
 
       case LD:
         cpu->registers[operand1] = cpu->registers[operand2];
+        cpu->pc +=2;
         break;
 
       case MUL:
@@ -216,34 +208,6 @@ void cpu_run(struct cpu *cpu)
         }
         break;
 
-      // case JGE:
-      //   if( cpu->flag == FL_GRTR || cpu->flag == FL_EQUL)
-      //   {
-      //     cpu->pc = cpu->registers[operand1] - 1;
-      //   }
-      //   break;
-
-      // case JGT:
-      //   if( cpu->flag == FL_GRTR )
-      //   {
-      //     cpu->pc = cpu->registers[operand1] - 1;
-      //   }
-      //   break;
-
-      // case JLE:
-      //   if( cpu->flag == FL_LESS || cpu->flag == FL_EQUL)
-      //   {
-      //     cpu->pc = cpu->registers[operand1] - 1;
-      //   }
-      //   break;
-
-      // case JLT:
-      //   if( cpu->flag == FL_LESS )
-      //   {
-      //     cpu->pc = cpu->registers[operand1] - 1;
-      //   }
-      //   break;
-
       case PUSH:
         cpu->registers[7] -= 1;
         cpu_ram_write(cpu , cpu->registers[7] ,cpu->registers[operand1]);
@@ -272,6 +236,7 @@ void cpu_run(struct cpu *cpu)
     // 6. Move the PC to the next instruction.
     cpu->pc ++;
   }
+  cpu_destroy(cpu);
 }
 
 /**
@@ -286,3 +251,5 @@ void cpu_init(struct cpu *cpu)
   cpu->registers[7] = 0xF4;
   cpu->flag = FL_INIT;
 }
+
+
